@@ -8,5 +8,7 @@
 /.idea/shelf/Uncommitted_changes_before_Update_at_04_04_2023,_12_46_[Changes]/shelved.patch
 /.idea
 /.idea/OS.js.iml
+.idea/*
 /out/*
+/.vscode
 
