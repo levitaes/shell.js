@@ -109,6 +109,10 @@ export class Terminal {
                 this.motd = line.split(" ").slice(1).join(" ").replace(/"/g, '');
             }
 
+            if (line.startsWith("autostart ")) {
+                this.autoStart = line.split(" ").slice(1).join(" ").replace(/"/g, '');
+            }
+
         }
     }
 
@@ -162,6 +166,14 @@ export class Terminal {
      */
     async loop() {
         const lines = document.getElementById("lines");
+        if(this.autoStart) {
+            try{
+                await functionLoader.run(this.autoStart);
+            }
+            catch(err) {
+
+            }
+        }
         while (true) {
             this.historyPointer = this.history.length;
             const config = {autoComplete: "apps", history: true};
