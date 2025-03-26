@@ -54,7 +54,13 @@ export class Dialog {
     sayRaw(message) {
         if (ifIsPipeWriteToBuf(this, message)) return;
 
-        new CommandLine(message, {raw: true});
+        const cl =new CommandLine(message, {raw: true});
+        return cl.shadowRoot
+    }
+
+    getDom(){
+        const cl =new CommandLine("", {raw: true});
+        return cl.shadowRoot
     }
 
     /**
@@ -279,7 +285,12 @@ export class CommandLine extends HTMLElement {
             let tmpl = document.getElementById('commandLineTemplate');
             const p = tmpl.content.querySelector('p');
             if (config.raw === true) {
-                p.innerHTML = this.data;
+                if (typeof this.data == "string") {
+                    p.innerHTML = this.data;
+                } else if (typeof this.data == "object") {
+                    p.appendChild(this.data);
+                }
+
             } else {
                 if (config.typewriter === undefined || config.typewriter === 0) {
                     p.innerText = this.data;

@@ -28,6 +28,7 @@ const arr = [
     "cp.function.js",
     "chmod.function.js",
     "ed.function.js",
+    "gui.function.js",
 ]
 export const appList =  {
     apps: arr,

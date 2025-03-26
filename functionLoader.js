@@ -43,6 +43,7 @@ os.load = async () => {
         const path = `./${appList.path}/${app}`;
         await AppManager.instance.addApp(path);
     }));
+    postMessageAPI();
 }
 
 /**
@@ -78,6 +79,13 @@ const runO = (data) => {
             options.pipe = true;
             args = args.filter(e => e !== '|');
         }
+        if (args.includes('>>')) {
+            options.pipe = true;
+            options.mode = ">>";
+            options.path = args[args.indexOf('>>') + 1];
+            // remove all args after the >>
+            args = args.slice(0, args.indexOf('>>'));
+        }
 
         if (args.includes('>')) {
             options.pipe = true;
@@ -85,13 +93,6 @@ const runO = (data) => {
             options.path = args[args.indexOf('>') + 1];
             // remove all args after the >
             args = args.slice(0, args.indexOf('>'));
-        }
-        if (args.includes('>>')) {
-            options.pipe = true;
-            options.mode = ">>";
-            options.path = args[args.indexOf('>>') + 1];
-            // remove all args after the >>
-            args = args.slice(0, args.indexOf('>>'));
         }
 
         // check if the command has the correct amount of arguments
@@ -117,12 +118,13 @@ const runO = (data) => {
 
             if (options.mode === ">" || options.mode === ">>") {
                 const file = os.wd.getOrCreateFile(options.path);
-                if (options.mode === ">") {
-                    file.setData(output.join('\n'));
-                    resolve();
-                }
                 if (options.mode === ">>") {
                     file.appendData(output.join('\n'));
+                    resolve();
+                }
+
+                if (options.mode === ">") {
+                    file.setData(output.join('\n'));
                     resolve();
                 }
             }
@@ -156,20 +158,21 @@ os.run = (data) => {
             const parts = command.split(' ')
             // check for alias
             if (Terminal.instance.alias.has(parts[0])) {
-               //replace alias with the command
+                //replace alias with the command
                 parts[0] = Terminal.instance.alias.get(parts[0]);
                 command = parts.join(' ');
                 console.log("alias", command);
             }
 
             // find > and >>, remove them from the command and put them at the end of the generated command
-            if (command.includes('>')) {
-                string = "> " + command.split('>')[1].trim();
-                command = command.split('>')[0].trim();
-            }
             if (command.includes('>>')) {
                 string = ">> " + command.split('>>')[1].trim();
                 command = command.split('>>')[0].trim();
+            }
+
+            if (command.includes('>')) {
+                string = "> " + command.split('>')[1].trim();
+                command = command.split('>')[0].trim();
             }
 
             const cmd = `${command} ${lastOutput.join(' ')} ${string}`
@@ -179,6 +182,23 @@ os.run = (data) => {
     });
 }
 
+
+function postMessageAPI() {
+    // Called sometime after postMessage is called
+    window.addEventListener("message", async (event) => {
+        if (event.data === undefined) return;
+
+        if (event.data.type === "cmd") {
+            console.log(event.data);
+            const args = event.data.data.trim().split(' ');
+            const command = args.shift();
+            const output = await AppManager.instance.run(command, os, args, {pipe: true});
+            event.source.postMessage(output);
+            return
+        }
+    });
+
+}
 
 await os.load();
 export default os;
