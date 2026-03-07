@@ -163,6 +163,14 @@ export class INode {
         console.warn("getSize() not implemented for " + this.constructor.name);
         return 0;
     }
+
+    /**
+     * Is it a hidden Node
+     * @returns {boolean}
+     */
+    isHidden() {
+        return this.name.startsWith('.')
+    }
 }
 
 /**
@@ -215,6 +223,7 @@ export class File extends INode {
         this.metadata.modified = Date.now();
         FileSystem.instance.save();
     }
+
 }
 
 /**

@@ -5,6 +5,7 @@ export default {
     description: 'gui',
     arguments: 0,
     async execute(os, args) {
+        os.dialog.clear();
         const doom = os.dialog.getDom()
 
 
@@ -188,10 +189,12 @@ export default {
 
         function closeGui() {
             resolve();
+            document.removeEventListener('contextmenu', contextmenu);
+
             doom.innerHTML = "";
         }
 
-        // document.addEventListener('contextmenu', contextmenu);
+        document.addEventListener('contextmenu', contextmenu);
 
 
         function contextmenu(e) {
