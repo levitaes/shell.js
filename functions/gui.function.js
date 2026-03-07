@@ -429,7 +429,7 @@ class Editor extends AppBox {
         this.node = node;
 
         const textArea = document.createElement("textarea");
-        textArea.value = node.data;
+        textArea.value = node.getData();
         textArea.classList.add("editorArea");
         textArea.autocomplete = "on";
         textArea.autocorrect = "on";
